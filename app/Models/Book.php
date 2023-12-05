@@ -35,6 +35,10 @@ class Book extends Model
         ], 'rating')->orderBy('reviews_avg_rating', 'desc');
     }
 
+    public function scopeMinReviews(Builder $query, int $minReviews): Builder
+    {
+        return $query->having('reviews_count', '>=', $minReviews);
+    }
     private function dateRangeFilter(Builder $query, $from = null, $to = null){
         if($from && !$to){
             $query->where('created_at', '>=', $from);
@@ -43,5 +47,6 @@ class Book extends Model
         }elseif ($from && $to){
             $query->whereBetween('created_at', [$from, $to]);
         }
+         return $query;
     }
 }
