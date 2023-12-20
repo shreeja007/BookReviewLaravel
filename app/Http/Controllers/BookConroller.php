@@ -13,11 +13,19 @@ class BookConroller extends Controller
     public function index(Request $request)
     {
         $title = $request->input('title');
-        $filter = $request->input('filter', '');
+        $filter = $request->input('filter', 'all');
 
         $books = Book::when($title, function ($query, $title) {
             return $query->title($title);
-        })->get();
+        });
+        $books = match($filter) {
+            'popular_last_month' => $books->popularLastMonth(),
+            'popular_last_6month' => $books->popularLas6Month(),
+            'highest_rated_last_month' => $books->highestRatedLastMonth(),
+            'highest_rated_last_6month' => $books->HighestRatedLast6Month(),
+            default => $books->latest(),
+        };
+        $books = $books->get();
 
         //in arrow function
         // $book = Book::when($title, fn($query,$title)=>$query->title($title))->get();
